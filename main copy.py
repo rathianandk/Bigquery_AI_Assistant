@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="BigQuery Temporary Token Vending API",
-    description="Provides short-lived access tokens for judges to run BigQuery queries.",
+    description="Provides short-lived access tokens to run BigQuery queries.",
     version="1.0.0"
 )
 
