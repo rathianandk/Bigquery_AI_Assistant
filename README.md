@@ -13,15 +13,12 @@ The system follows a multi-stage pipeline, all orchestrated within the Google Cl
 3.  **Secure Authentication**: A secure REST API, deployed as a Cloud Run service, provides temporary access tokens to authenticate the notebook user and authorize access to GCP resources.
 4.  **Interactive UI**: The user interacts with the assistant through a Jupyter-like interface powered by `ipywidgets`. They can select predefined questions or ask their own.
 5.  **Vector Search & Context Retrieval**: The user's question is converted into an embedding. A `VECTOR_SEARCH` query is then executed in BigQuery to find the most relevant documents from the knowledge base.
-6.  **Answer Generation & Display**: The retrieved documents are passed as context to a generative model in Vertex AI (`gemini-2.0-flash`). The model generates a comprehensive answer, which is then displayed to the user along with performance metrics, search results, and a cosine wave visualization of the similarity scores.
-
+6.  **Answer Generation & Display**: The retrieved documents are passed as context to a generative model in Vertex AI (`gemini-2.0-flash`). The model generates a comprehensive answer, which is then displayed to the user along with performance metrics, and search results.
 ## 核心文件 (Core Files)
 
 -   `nvidia_AI_assistant.py`: The main application file. It contains the logic for the interactive UI, search, and answer generation. **Run this file in a Jupyter-compatible environment to start the assistant.**
 -   `setup_data_pipeline.py`: A utility script to create the necessary BigQuery dataset, tables, and remote models for the project.
--   `nvidia_docs_ingestion.py`: A script responsible for ingesting and processing NVIDIA's documentation into BigQuery.
 -   `generate_stackoverflow_embeddings.py`: A script to ingest Stack Overflow data and generate embeddings.
--   `requirements.txt`: A list of all the Python packages required to run the project.
 
 ## 🚀 Quick Start
 
@@ -47,25 +44,7 @@ Install all the required Python packages.
 pip install -r requirements.txt
 ```
 
-### 3. Deploy Data Pipeline
-
-Run the setup script to prepare your BigQuery environment. This will create the dataset, tables, and ML models.
-
-```bash
-python setup_data_pipeline.py
-```
-
-### 4. Ingest Data
-
-Run the ingestion scripts to populate your BigQuery tables with data from NVIDIA's documentation and Stack Overflow.
-
-```bash
-# (Instructions for running ingestion may vary based on data sources)
-python nvidia_docs_ingestion.py
-python generate_stackoverflow_embeddings.py
-```
-
-### 5. Run the Assistant
+### 3. Run the Assistant
 
 Open `nvidia_AI_assistant.py` in a Jupyter-compatible environment (like VS Code with the Jupyter extension or a Jupyter Notebook) and run all cells. The interactive UI will appear, allowing you to ask questions.
 
