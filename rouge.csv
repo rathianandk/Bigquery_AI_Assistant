@@ -1,0 +1,452 @@
+doc_id,title,question,answer,source_url,tags
+61407421,How to run Neural Network model on Android taking advantage of GPU?,"How to run Neural Network model on Android taking advantage of GPU?
+
+<p>Anyone tried to run object detection or crnn model on Android? I tried to run crnn model (serialized pytorch) but it takes 1s on Huawei P30 lite and 5s on Samsung J4 Core.</p>
+
+<pre><code>Huawei P30 lite
+    CPU : octa core processor
+    GPU : Mali-G51 MP4
+
+Samsung J4
+  CPU : quad core
+  GPU : Adreno 308
+</code></pre>
+
+<p>GPU's in the android device are different from dedicated GPU in the sense that they don't have VRAM and power management. Both CPU and GPU shares the same RAM. Before running model on PC with GPU we specify to place my computation on GPU like</p>
+
+<pre class=""lang-py prettyprint-override""><code>model = MyModel()
+model.cuda()
+</code></pre>
+
+<p>But when I try to run model on Android does it take advantage of this built in GPU? or computation is faster in my Huawei because of this octa core processor, but Huawei obviously has better GPU than my Samsung device.</p>","<p>At the moment it is not possible to run pytorch on am ARM-GPU:</p>
+
+<p><a href=""https://github.com/pytorch/android-demo-app/issues/35"" rel=""nofollow noreferrer"">Github Issue</a></p>
+
+<p><a href=""https://discuss.pytorch.org/t/how-can-i-enable-gpu-support-for-torch-mobile-on-android/70937"" rel=""nofollow noreferrer"">PyTorch Forum</a></p>
+
+<p>I think the differences in speed result out of the differnten cpu's!</p>",https://stackoverflow.com/questions/61407421,android|tensorflow|gpu|torchvision|torchscript
+56858213,How to create NVIDIA OpenCL project,"How to create NVIDIA OpenCL project
+
+<p>I want to write application in NVIDIA OpenCL in Visual Studio 2017 but don't know how to create project for this purpose. </p>
+
+<p>I have GPU from NVIDIA (GeForce 940M) and Intel (HD Graphics 5500) and already managed to open and run Intel example programs for OpenCL but they have almost one thousand lines of code, so I decided to try NVIDIA OpenCL but don't know how. On some forums they say that I should download CUDA toolkit and it install OpenCL, others say that I should download driver that supports OpenCL but I don't know which driver will be proper. I have already installed CUDA and driver from <a href=""https://www.nvidia.pl/Download/index.aspx?lang=pl"" rel=""noreferrer"">https://www.nvidia.pl/Download/index.aspx?lang=pl</a> but still I have not possibility to create NVIDIA project in OpenCL in Visual Studio.</p>","<p>The OpenCL Runtime is already included in the Nvidia graphics drivers. You only need the OpenCL C++ header files, the <code>OpenCL.lib</code> file and on Linux also the <code>libOpenCL.so</code> file. These come with the CUDA toolkit, but there is no need to install it only to get the 9 necessary files.</p>
+<p>Here are the OpenCL C++ header files and the lib file from CUDA toolkit 10.1:
+<a href=""https://github.com/ProjectPhysX/OpenCL-Wrapper/tree/master/src/OpenCL"" rel=""nofollow noreferrer"">https://github.com/ProjectPhysX/OpenCL-Wrapper/tree/master/src/OpenCL</a></p>
+<p>Download the <code>OpenCL</code> folder and copy it into your project source folder.
+Then in your Visual Studio Project, go to &quot;Project Properties -&gt; C/C++ -&gt; General -&gt; Additional Include Directories&quot; and add <code>C:\path\to\your\project\src\OpenCL\include</code>. Then, in &quot;Project Properties -&gt; Linker -&gt; All Options -&gt; Additional Dependencies&quot; add <code>OpenCL.lib;</code> and in &quot;Project Properties -&gt; Linker -&gt; All Options -&gt; Additional Library Directories&quot; add <code>C:\path\to\your\project\src\OpenCL\lib</code>.</p>
+<p>Finally, in your <code>.cpp</code> source file, include the headers with <code>#include &lt;CL/cl.hpp&gt;</code>.</p>
+<p>This also works for AMD/Intel GPUs and CPUs. It also works on Linux if you compile with:</p>
+<pre><code>g++ *.cpp -o Test.exe -I./OpenCL/include -L./OpenCL/lib -lOpenCL
+</code></pre>
+<hr />
+<p>For an easy start with OpenCL, I created a wrapper that vastly simplifies the OpenCL C++ bindings and eliminates the entire code overhead that comes with it. This includes the OpenCL headers and all Visual Studio project settings; no additional setup required:
+<a href=""https://github.com/ProjectPhysX/OpenCL-Wrapper"" rel=""nofollow noreferrer"">https://github.com/ProjectPhysX/OpenCL-Wrapper</a></p>",https://stackoverflow.com/questions/56858213,c++|visual-studio|opencl|nvidia
+53256405,Howto pass flag to nvcc compiler in CMAKE,"Howto pass flag to nvcc compiler in CMAKE
+
+<p>I have a C project in <code>Cmake</code> in which I have embedded <code>cuda</code> <em>kernel module</em>.</p>
+
+<p>I want to pass <code>--ptxas-options=-v</code> only to <code>nvcc</code> in-order to view 
+<em>Number of registers usage per thread</em> and 
+<em>shared Memory usage per block</em>.</p>
+
+<p>By searching on howto pass flags to <code>nvcc</code> in <code>Cmake</code>, I came across a solution </p>
+
+<pre><code>add_compile_options(myprog
+    PRIVATE
+    $&lt;$&lt;COMPILE_LANGUAGE:C&gt;:-Wall&gt;
+    $&lt;$&lt;COMPILE_LANGUAGE:CUDA&gt;:-arch=sm_20 -ptxas-options=-v&gt;
+)
+</code></pre>
+
+<p>but this didn't show me the above properties. I think these flags aren't passed to <code>nvcc</code> properly.</p>
+
+<p>How can I pass <code>--ptxas-options=-v</code> to my <code>nvcc</code> compiler ?</p>","<p>The proper way to set CUDA flags <strong>only on a target</strong> is</p>
+
+<pre><code>target_compile_options(&lt;my_target&gt; PRIVATE $&lt;$&lt;COMPILE_LANGUAGE:CUDA&gt;:my_cuda_option&gt;) 
+</code></pre>
+
+<p>This will set the option, via the generator expression, only for files which are compiled for the CUDA language. </p>
+
+<p>Using <code>CMAKE_CUDA_FLAGS</code> as suggested by the other answer sets a global property for all targets, which might or might not be the right approach depending on the use-case.</p>",https://stackoverflow.com/questions/53256405,cmake|cuda|nvcc
+55830220,How to get cmake to enable cuda when compiling yolo (darknet)?,"How to get cmake to enable cuda when compiling yolo (darknet)?
+
+<p>I am currently using the cmake-gui to compile yolo darknet at <a href=""https://github.com/AlexeyAB/darknet.git"" rel=""noreferrer"">https://github.com/AlexeyAB/darknet.git</a>. However, it will not enable cuda and I am having a few other odd issues. These include when I run darknet.exe from the Release folder after building it using VS2017, it states that it cannot find pthreadVC2.dll or opencv_world410.dll. </p>
+
+<p>To fix the other issues, I copied the exe and those files and put them all in the root folder of the project. This seems to work but I am not sure why it wouldn't work otherwise. </p>
+
+<p>For cuda, I am not sure what to try. I have these system variables and path:
+<a href=""https://i.stack.imgur.com/xSYIO.png"" rel=""noreferrer""><img src=""https://i.stack.imgur.com/xSYIO.png"" alt=""System Variables""></a>
+<a href=""https://i.stack.imgur.com/z3OAj.png"" rel=""noreferrer""><img src=""https://i.stack.imgur.com/z3OAj.png"" alt=""System Variable Path""></a></p>
+
+<p>Here is my cmake-gui:
+<a href=""https://i.stack.imgur.com/RET6P.png"" rel=""noreferrer""><img src=""https://i.stack.imgur.com/RET6P.png"" alt=""cmake1""></a>
+<a href=""https://i.stack.imgur.com/Ui191.png"" rel=""noreferrer""><img src=""https://i.stack.imgur.com/Ui191.png"" alt=""cmake2""></a></p>
+
+<p>It can be seen that CMAKE_CUDA_COMPILER is NOTFOUND. Which I am thinking is the problem, but I am not sure why it cannot be found. If I run <code>nvcc -V</code> in the command prompt, it returns:</p>
+
+<pre><code>nvcc: NVIDIA (R) Cuda compiler driver
+Copyright (c) 2005-2018 NVIDIA Corporation
+Built on Sat_Aug_25_21:08:04_Central_Daylight_Time_2018
+Cuda compilation tools, release 10.0, V10.0.130
+</code></pre>
+
+<p>Also here is the output for cmake configuration:</p>
+
+<pre><code>Selecting Windows SDK version 10.0.17763.0 to target Windows 10.0.17134.
+OpenCV ARCH: x64
+OpenCV RUNTIME: vc15
+OpenCV STATIC: OFF
+Found OpenCV 4.1.0 in C:/opencv/build/x64/vc15/lib
+You might need to add C:\opencv\build\x64\vc15\bin to your PATH to be able to run your applications.
+ZED SDK not enabled, since it requires CUDA
+Configuring done
+</code></pre>
+
+<p>If you have any tips for any of these problems, please let me know. Just an FYI, currently darknet does work and if I test it on dog.jpg, it successfully detects the classes. However, this is of course without Cuda or cudnn and I would like to use these eventually. Thank you! If you need anything else from me please let me know!</p>","<p>The answer was given by @Andropogon: CUDA has to be reinstalled after Visual Studio.</p>
+
+<p>This is what we found when I dug into it a bit with my colleague:</p>
+
+<ol>
+<li>Similar to OP, all compilation steps seemed to run without error and generate an executable.</li>
+<li>Taking a closer look at cmake, under CMAKE/CMAKE_CUDA_COMPILER it said <code>NOT FOUND</code>, despite nvcc.exe being on the <code>Path</code>. (<code>nvcc --version</code> runs fine in Powershell.) We manually entered the location of nvcc.exe to this option, and now configure comes up with a more helpful error message: <code>No CUDA toolset found.</code> with reference to line numbers in various cmake files. Among those lines was this message, which seems to confirm that Visual Studio (VS) is part of the problem, </li>
+</ol>
+
+<pre><code>    if(NOT CMAKE_VS_PLATFORM_TOOLSET_CUDA)
+            message(FATAL_ERROR ""No CUDA toolset found."")
+</code></pre>
+
+<p>So after reinstalling CUDA the compilation looked more like I would expect - but I still get an executable which doesn't appear to do anything (no output on the command line, no <code>prediction.jpg</code> generated). Anyway, hopefully that can shed a bit of light on the CUDA/VS/cmake issue.</p>",https://stackoverflow.com/questions/55830220,cmake|cuda|visual-studio-2017|cudnn|yolo
+66233462,When does MIO Throttle stall happen?,"When does MIO Throttle stall happen?
+
+<p>According to this link <a href=""https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html"" rel=""nofollow noreferrer"">https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html</a>:</p>
+<blockquote>
+<p>Warp was stalled waiting for the MIO (memory input/output) instruction
+queue to be not full. This stall reason is high in cases of extreme
+utilization of the MIO pipelines, which include special math
+instructions, dynamic branches, as well as shared memory instructions.</p>
+</blockquote>
+<p>And according to this one <a href=""https://docs.nvidia.com/drive/drive_os_5.1.12.0L/nsight-graphics/activities/index.html"" rel=""nofollow noreferrer"">https://docs.nvidia.com/drive/drive_os_5.1.12.0L/nsight-graphics/activities/index.html</a>:</p>
+<blockquote>
+<p>May be triggered by local, global, shared, attribute, IPA, indexed
+constant loads (LDC), and decoupled math.</p>
+</blockquote>
+<p>My understanding is that all memory operations are executed on LSUs, so I would imagine that they are stored on the same instruction queue together and then executed by the LSU unit. Since they are all queued together, the second interpretation (which includes global memory accesses) makes more sense to me. The problem is that if that's the case, LG Throttle would be unnecessary.</p>
+<p>What does MIO Throttle actually imply? Are all memory instructions stored on the same queue?</p>","<p>The MIO is a partition in the NVIDIA SM (starting in Maxwell) that contains execution units shared between the 4 warp schedulers or slower math execution units (e.g. XU pipe).</p>
+<p>Instructions issued to these execution units are first issued into instruction queues allowing the warp schedulers to continue to issue independent instructions from the warp. If a warp's next instruction is to an instruction queue that is full then the warp is stalled until the queue is not full and the instruction can be enqueued. When this stall occurs the warp will report a throttle reason based upon the instruction queue type. The mapping of instruction queues to pipes differs between chips. This is the general mapping.</p>
+<ul>
+<li>mio_throttle (ADU, CBU, LSU, XU)</li>
+<li>lg_throttle (LSU)
+<ul>
+<li>lg_throttle is used if MIO instruction queue reaches a watermark for local/global instructions. Throttling local/global instructions early allows SM to continue to issue shared memory instructions when L1 backpressure due to local/global L1 misses.</li>
+</ul>
+</li>
+<li>tex_throttle (TEX, FP64 on non-*100 chips, Tensor on TU11x)</li>
+</ul>
+<p>If the warp's next instruction to issue is to a sub-partition specific execution unit (FMA, ALU, Tensor, FP64 (*100 GPUs) then the stall reason is math_throttle.</p>",https://stackoverflow.com/questions/66233462,cuda|gpu|nvidia|nsight-compute
+52030952,Can nvidia-docker be run without a GPU?,"Can nvidia-docker be run without a GPU?
+
+<p>The official PyTorch <a href=""https://github.com/pytorch/pytorch/blob/master/docker/pytorch/Dockerfile"" rel=""noreferrer"">Docker image</a> is based on <a href=""https://hub.docker.com/r/nvidia/cuda/"" rel=""noreferrer""><code>nvidia/cuda</code></a>, which is able to run on Docker CE, without any GPU. It can also run on <a href=""https://github.com/NVIDIA/nvidia-docker"" rel=""noreferrer"">nvidia-docker</a>, I presume with CUDA support enabled. Is it possible to run nvidia-docker itself on an x86 CPU, without any GPU? Is there a way to build a single Docker image that takes advantage of CUDA support when it is available (e.g. when running inside <code>nvidia-docker</code>) and uses the CPU otherwise? What happens when you use <code>torch.cuda</code> from inside Docker CE? What exactly is the difference between Docker CE and why can't <code>nvidia-docker</code> be merged into Docker CE?</p>","<p><code>nvidia-docker</code> is a shortcut for <code>docker --runtime nvidia</code>. I do hope they merge it one day, but for now it's a 3rd party runtime. They explain what it is and what it does on their <a href=""https://github.com/NVIDIA/nvidia-container-runtime"" rel=""noreferrer"">GitHub page</a>.</p>
+
+<blockquote>
+  <p>A modified version of runc adding a custom pre-start hook to all containers.
+  If environment variable NVIDIA_VISIBLE_DEVICES is set in the OCI spec, the hook will configure GPU access for the container by leveraging nvidia-container-cli from project libnvidia-container.</p>
+</blockquote>
+
+<p>Nothing stops you from running images meant for <code>nvidia-docker</code> with normal <code>docker</code>. They work just fine but if you run something in them that requires the GPU, that will fail.</p>
+
+<p>I don't think you can run <code>nvidia-docker</code> on a machine without a GPU. It won't be able to find the CUDA files it's looking for and will error out.</p>
+
+<p>To create an image that can run on both <code>docker</code> and <code>nvidia-docker</code>, your program inside it needs to be able to know where it's running. I am not sure if there's an official way, but you can try one of the following:</p>
+
+<ul>
+<li>Check if <code>nvidia-smi</code> is available</li>
+<li>Check if the directory specified in <code>$CUDA_LIB_PATH</code> exists</li>
+<li>Check if your program can load the CUDA libraries successfully, and if it can't just fallback</li>
+</ul>",https://stackoverflow.com/questions/52030952,docker|cuda|pytorch|nvidia-docker
+49887574,How to get 16bit floats in modern GLSL with Vulkan?,"How to get 16bit floats in modern GLSL with Vulkan?
+
+<p>It appears at one point in time Nvidia had an extension that permitted half floating point values for <a href=""https://www.khronos.org/registry/OpenGL/extensions/NV/NV_half_float.txt"" rel=""nofollow noreferrer"">OpenGL <strong>1.1</strong></a>, but apparently since that time *the world <a href=""https://stackoverflow.com/questions/44595137/glsl-half-floating-point-attribute-type"">half has been reclaimed</a> by the modern GLSL spec at some point.  </p>
+
+<p>Today I can use <a href=""https://devblogs.nvidia.com/mixed-precision-programming-cuda-8/"" rel=""nofollow noreferrer"">16bit floating point values in CUDA</a> no problem, there should not be an issue in hardware for NVIDIA to support 16bit floats, and they appear to support them in HLSL, and heck even seem to <a href=""https://github.com/KhronosGroup/SPIRV-Cross/issues/484"" rel=""nofollow noreferrer"">contradictory support them in HLSL cross compilation</a> to SPIR-V while GLSL does not for Nvidia.  It seems like SPIR-V has all the primitives needed to support 16bit floating point regardless with <a href=""https://www.khronos.org/registry/spir-v/specs/unified1/SPIRV.html#_a_id_capability_a_capability"" rel=""nofollow noreferrer"">primary extensions</a> (KHR) so there doesn't seem to be a reason why it should forbid me from using them. </p>
+
+<p>I'm unsure why, despite having an Nvidia card, I can't take advantage of 16bit floating point arithmetic, and am apparently <a href=""https://github.com/KhronosGroup/glslang/blob/master/Test/spv.float16.frag"" rel=""nofollow noreferrer"">forced to use AMD</a> or switch API's entirely if I want to take advantage of that.  Surely there must be some way to actually use true 16bit floating point values for both? </p>
+
+<p>I am NOT asking about host to device allocated buffers (IE vertex buffers). Yes, you can allocate those as 16bit floats with a KHR extension and not have to much of an issue, but inside the actual shader, using 16bit floats, and not 16bit floats coerced to 32 bit floats is what I'm worried about. </p>","<p>You are presumably using glslang the compiler to compile your GLSL to SPIR-V. With that compiler, platform-specific extensions to GLSL aren't <em>really</em> ""platform-specific"". The <em>compiler</em> and the Vulkan receiving the SPIR-V code are what generally matters.</p>
+
+<p>Because GL_AMD_gpu_shader_half_float functionality maps directly to a SPIR-V feature rather than an AMD extension, glslang will output SPIR-V code that uses the <code>Float16</code> capability. So long as the receiving Vulkan implementation offers that <code>Float16</code> capability, you're fine.</p>
+
+<p>Of course, you're not fine because Vulkan implementations <em>don't</em> offer this capability. No Vulkan feature or extension, even VK_AMD_gpu_shader_half_float, offers this SPIR-V capability. And if Vulkan doesn't offer the capability, then you can't pass a SPIR-V shader that uses the cap to it.</p>
+
+<p>That is, you can compile shaders that use it, but you can't pass those shaders to Vulkan <a href=""https://github.com/KhronosGroup/Vulkan-Docs/issues/706"" rel=""nofollow noreferrer"">at present</a>.</p>",https://stackoverflow.com/questions/49887574,floating-point|glsl|gpu|vulkan|spir-v
+56777807,Why is half-precision complex float arithmetic not supported in Python and CUDA?,"Why is half-precision complex float arithmetic not supported in Python and CUDA?
+
+<p>NumPY has <a href=""https://docs.scipy.org/doc/numpy/user/basics.types.html"" rel=""nofollow noreferrer"">complex64</a> corresponding to two float32's.</p>
+
+<p>But it also has float16's but no complex32.</p>
+
+<p>How come?  I have signal processing calculation involving FFT's where I think I'd be fine with complex32, but I don't see how to get there.  In particular I was hoping for speedup on NVidia GPU with <a href=""https://cupy.chainer.org/"" rel=""nofollow noreferrer"">cupy</a>.</p>
+
+<p>However it seems that float16 is <a href=""https://devtalk.nvidia.com/default/topic/974803/gpu-accelerated-libraries/half-precision-cufft-transforms/"" rel=""nofollow noreferrer"">slower</a> on GPU rather than faster.</p>
+
+<p>Why is half-precision unsupported and/or overlooked?</p>
+
+<p>Also related is why we don't have <a href=""https://stackoverflow.com/questions/13863523/is-it-possible-to-create-a-numpy-ndarray-that-holds-complex-integers"">complex integers</a>, as this may also present an <a href=""https://pdfs.semanticscholar.org/8347/9a33b8f1e1c86eb0e3731a1757cd20dd1381.pdf"" rel=""nofollow noreferrer"">opportunity for speedup</a>.</p>","<p>This issue has been raised in the CuPy repo for some time:</p>
+<p><a href=""https://github.com/cupy/cupy/issues/3370"" rel=""nofollow noreferrer"">https://github.com/cupy/cupy/issues/3370</a></p>
+<p>But there's no concrete work plan yet; most of the things are still of explorative nature.</p>
+<p>One of the reasons that it's not trivial to work out is that there's no <code>numpy.complex32</code> dtype that we can directly import (note that all CuPy's dtypes are just alias of NumPy's), so there'd be problems when a device-host transfer is asked. The other thing is there's no native mathematical functions written either on CPU or GPU for <code>complex32</code>, so we will need to write them all ourselves to do casting, ufunc, and what not. In the linked issue there is a link to a NumPy discussion, and my impression is it's currently not being considered...</p>",https://stackoverflow.com/questions/56777807,numpy|fft|cupy|half-precision-float
+54324918,How to use Nvidia's Tensor Cores via Vulkan,"How to use Nvidia's Tensor Cores via Vulkan
+
+<p>How can one make use of Nvidia's tensor cores (in a compute shader?!) using Vulkan?</p>
+
+<p>There is this article by Nvidia <a href=""https://devblogs.nvidia.com/programming-tensor-cores-cuda-9/"" rel=""noreferrer"">Programming Tensor Cores in CUDA 9</a>, but that's obviously focusing on CUDA. I am not too familiar with CUDA but it looks like some measures must be taken to enable computations on the Tensor cores, like the algorithm must be set to some kind special type, and some math type must be set to the value <code>CUDNN_TENSOR_OP_MATH</code>. I am wondering, if Tensor core acceleration could also be used from other APIs and I am especially interested in Vulkan.</p>
+
+<p>More specifically, I'd like to dig into filters for denoising a bit more. To my understanding, filters mostly require exactly those mathematical operations which Tensor cores are able to accelerate, which are matrix-multiply-and-accumulate operations. </p>","<p>Nvidia has recently added a few new extensions, one of them being <a href=""https://www.khronos.org/registry/vulkan/specs/1.1-extensions/html/vkspec.html#VK_NV_cooperative_matrix"" rel=""noreferrer""><code>VK_NV_COOPERATIVE_MATRIX</code></a> which will allow the use of tensor cores inside Vulkan.  </p>
+
+<p>The capability for <a href=""https://github.com/KhronosGroup/glslang"" rel=""noreferrer"">glslang</a> to handle this new feature I believe was added <strong>yesterday</strong> which is why you haven't seen this until now <a href=""https://github.com/KhronosGroup/glslang/commit/4605e2ed2b2b1acbe157d365c3c528367b8b168f"" rel=""noreferrer"">(see here)</a>:</p>
+
+<p><a href=""https://i.stack.imgur.com/qoWxy.png"" rel=""noreferrer""><img src=""https://i.stack.imgur.com/qoWxy.png"" alt=""enter image description here""></a></p>
+
+<p>here are some examples of it being used:</p>
+
+<p><a href=""https://github.com/KhronosGroup/glslang/blob/4605e2ed2b2b1acbe157d365c3c528367b8b168f/Test/spv.coopmat.comp"" rel=""noreferrer"">https://github.com/KhronosGroup/glslang/blob/4605e2ed2b2b1acbe157d365c3c528367b8b168f/Test/spv.coopmat.comp</a></p>
+
+<p><a href=""https://github.com/KhronosGroup/glslang/blob/4605e2ed2b2b1acbe157d365c3c528367b8b168f/Test/spv.1.3.coopmat.comp"" rel=""noreferrer"">https://github.com/KhronosGroup/glslang/blob/4605e2ed2b2b1acbe157d365c3c528367b8b168f/Test/spv.1.3.coopmat.comp</a></p>
+
+<pre><code>#version 450 core
+#extension GL_KHR_memory_scope_semantics : enable
+#extension GL_NV_cooperative_matrix : enable
+#extension GL_EXT_shader_explicit_arithmetic_types_float16 : enable
+
+#pragma use_variable_pointers
+
+layout (local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
+
+layout(set = 0, binding = 0) coherent buffer Block {
+    float y[1024*1024];
+    float x[];
+} block;
+
+
+void main()
+{
+    fcoopmatNV&lt;32, gl_ScopeSubgroup, 16, 8&gt; m = fcoopmatNV&lt;32, gl_ScopeSubgroup, 16, 8&gt;(0.0);
+
+    m = m + m;
+    m = m - m;
+    m = -m;
+    m = 2.0*m;
+    m = m*2.0;
+
+    coopMatLoadNV(m, block.x, 16, 128, false);
+    coopMatStoreNV(m, block.x, 16, 128, false);
+}
+</code></pre>
+
+<p>This appears to be quite analogous to how its done in CUDA, requiring explicit memory transfers to the memory where tensor cores can operate. </p>
+
+<p>So to use them you need VK_NV_COOPERATIVE_MATRIX in vulkan and GL_NV_COOPERATIVE_MATRIX in glsl. </p>
+
+<p>EDIT:</p>
+
+<p>j00hi has mentioned that there is now an <a href=""https://devblogs.nvidia.com/machine-learning-acceleration-vulkan-cooperative-matrices/"" rel=""noreferrer"">nvidia blog post</a> on how to use these tensor cores. </p>",https://stackoverflow.com/questions/54324918,nvidia|vulkan|gpu
+50193538,How to kill process on GPUs with PID in nvidia-smi using keyword?,"How to kill process on GPUs with PID in nvidia-smi using keyword?
+
+<p>How to kill running processes on GPUs for a specific program (e.g. python) in terminal?
+For example two processes are running with python in the top picture and kill them to see the bottom picture in nvidia-smi</p>
+
+<p><a href=""https://i.stack.imgur.com/SMzOK.png"" rel=""noreferrer""><img src=""https://i.stack.imgur.com/SMzOK.png"" alt=""For example two processes are running with python in the top picture and kill them to see the bottom picture in nvidia-smi""></a></p>","<p>You can grep python in the nvidia-smi and then pass the PID to
+the kill -9 command, e.g.</p>
+<blockquote>
+<p>sudo kill -9 $( nvidia-smi | grep 'python' | sed -n
+'s/|\s*[0-9]<em>\s</em>([0-9]<em>)\s</em>.*/\1/p' |  sed '/^$/d')</p>
+</blockquote>",https://stackoverflow.com/questions/50193538,python|gpu|nvidia|keyword|pid
+57284345,How to install nvidia apex on Google Colab,"How to install nvidia apex on Google Colab
+
+<p>what I did is follow the instruction on the official github site</p>
+
+<pre><code>!git clone https://github.com/NVIDIA/apex
+!cd apex
+!pip install -v --no-cache-dir ./
+</code></pre>
+
+<p>it gives me the error:</p>
+
+<pre><code>ERROR: Directory './' is not installable. Neither 'setup.py' nor 'pyproject.toml' found.
+Exception information:
+Traceback (most recent call last):
+  File ""/usr/local/lib/python3.6/dist-packages/pip/_internal/cli/base_command.py"", line 178, in main
+    status = self.run(options, args)
+  File ""/usr/local/lib/python3.6/dist-packages/pip/_internal/commands/install.py"", line 326, in run
+    self.name, wheel_cache
+  File ""/usr/local/lib/python3.6/dist-packages/pip/_internal/cli/base_command.py"", line 268, in populate_requirement_set
+    wheel_cache=wheel_cache
+  File ""/usr/local/lib/python3.6/dist-packages/pip/_internal/req/constructors.py"", line 248, in install_req_from_line
+    ""nor 'pyproject.toml' found."" % name
+pip._internal.exceptions.InstallationError: Directory './' is not installable. Neither 'setup.py' nor 'pyproject.toml' found.
+</code></pre>","<p>(wanted to just add a comment but I don't have enough reputation...)</p>
+
+<p>it works for me but the <code>cd</code> is actually not required. Also, I needed the two global options as suggested here: <a href=""https://github.com/NVIDIA/apex/issues/86"" rel=""noreferrer"">https://github.com/NVIDIA/apex/issues/86</a></p>
+
+<pre><code>%%writefile setup.sh
+
+git clone https://github.com/NVIDIA/apex
+pip install -v --no-cache-dir --global-option=""--cpp_ext"" --global-option=""--cuda_ext"" ./apex
+</code></pre>
+
+<p>then</p>
+
+<pre><code>!sh setup.sh
+</code></pre>",https://stackoverflow.com/questions/57284345,python|gpu|pytorch|nvidia|google-colaboratory
+58235790,How do I effectively parallelize AlphaZero on the GPU?,"How do I effectively parallelize AlphaZero on the GPU?
+
+<p>I'm implementing a version of AlphaZero (AlphaGo's most recent incarnation) to be applied to some other domain.</p>
+
+<p>The crux of the algorithm is a Monte Carlo Tree Search of the state space (CPU) interleaved with 'intuition' (probabilities) from a neural network in eval mode (GPU). The MCTS result is then used to train the neural network.</p>
+
+<p>I already parallelized the CPU execution by launching multiple processes which each build up their own tree. This is effective and has now lead to a <strong>GPU bottleneck</strong>! (nvidia-smi showing the GPU at 100% all the time)</p>
+
+<p>I have devised 2 strategies to parallelize GPU evaluations, however both of them have problems.</p>
+
+<ul>
+<li><p><strong>Each process evaluates the network only on batches from its own tree.</strong> In my initial naive implementation, this meant a batch size of 1. However, by refactoring some code and adding a 'virtual loss' to discourage (but not completely block) the same node from being picked twice we can get larger batches of size 1-4. The problem here is that we cannot allow large delays until we evaluate the batch or accuracy suffers, so a small batch size is key here.</p></li>
+<li><p><strong>Send the batches to a central ""neural network worker"" thread which combines and evaluates them.</strong> This could be done in a large batch of 32 or more, so the GPU could be used very efficiently. The problem here is that the tree workers send CUDA tensors 'round-trip' which is not supported by PyTorch. It is supported if I clone them first, but all that constant copying makes this approach slower than the first one.</p></li>
+</ul>
+
+<p>I was thinking maybe a clever batching scheme that I'm not seeing could make the first approach work. Using multiple GPUs could speed up the first approach too, but the kind of parallelism I want is not natively supported by PyTorch. Maybe keeping all tensors in the NN worker and only sending ids around could improve the second approach, however the difficulty here is how to synchronize effectively to get a large batch without making the CPU threads wait too long.</p>
+
+<p>I found next to no information on how AlphaZero or AlphaGo Zero were parallelized in their respective papers. I was able to find limited information online however which lead me to improve the first approach.</p>
+
+<p>I would be grateful for any advice on this, particularly if there's some point or approach I missed.</p>","<p>Use tensorflow serving as an example, The prediction service could run in a different process, running a service to receive request from the worker (runs a MCTS process and send prediction request to the prediction service). We can keep a dict from the socket address to the socket itself.</p>
+
+<p>The prediction service could read each query body and their header(which is different for each query), we can put that headers in a queue. While wait for maybe at most 100ms or the current batch is bigger than a batch size, The prediction runs. After the GPU gives the results, we loop over the results and as the order is the same as the headers in the queue, we can send back the responses via the socket based on each header (can be looked up from the dict we kept above). </p>
+
+<p>As each query comes with a different header, you can not miss the request, response and the socket. While you can run a tensorflow serving with a GPU card while running multiple worker to keep the batch size big enough to get a larger throughput.</p>
+
+<p>I aslo find a batching mechanism here in this repo: 
+<a href=""https://github.com/richemslie/galvanise_zero"" rel=""nofollow noreferrer"">https://github.com/richemslie/galvanise_zero</a></p>",https://stackoverflow.com/questions/58235790,python|machine-learning|neural-network|pytorch|monte-carlo-tree-search
+48152674,How do I check if PyTorch is using the GPU?,"How do I check if PyTorch is using the GPU?
+
+<p>How do I check if PyTorch is using the GPU? The <code>nvidia-smi</code> command can detect GPU activity, but I want to check it directly from inside a Python script.</p>","<p>These functions should help:</p>
+<pre><code>&gt;&gt;&gt; import torch
+
+&gt;&gt;&gt; torch.cuda.is_available()
+True
+
+&gt;&gt;&gt; torch.cuda.device_count()
+1
+
+&gt;&gt;&gt; torch.cuda.current_device()
+0
+
+&gt;&gt;&gt; torch.cuda.device(0)
+&lt;torch.cuda.device at 0x7efce0b03be0&gt;
+
+&gt;&gt;&gt; torch.cuda.get_device_name(0)
+'GeForce GTX 950M'
+</code></pre>
+<p>This tells us:</p>
+<ul>
+<li>CUDA is available and can be used by one device.</li>
+<li><code>Device 0</code> refers to the GPU <code>GeForce GTX 950M</code>, and it is currently chosen by PyTorch.</li>
+</ul>",https://stackoverflow.com/questions/48152674,python|memory-management|gpu|nvidia|pytorch
+67707828,How to get every second's GPU usage in Python,"How to get every second's GPU usage in Python
+
+<p>I have a model which runs by <code>tensorflow-gpu</code> and my device is <code>nvidia</code>. And I want to list every second's GPU usage so that I can measure average/max GPU usage. I can do this mannually by open two terminals, one is to run model and another is to measure by <code>nvidia-smi -l 1</code>. Of course, this is not a good way. I also tried to use a <code>Thread</code> to do that, here it is.</p>
+<pre><code>import subprocess as sp
+import os
+from threading import Thread
+
+class MyThread(Thread):
+    def __init__(self, func, args):
+        super(MyThread, self).__init__()
+        self.func = func
+        self.args = args
+
+    def run(self):
+        self.result = self.func(*self.args)
+
+    def get_result(self):
+        return self.result
+
+def get_gpu_memory():
+   output_to_list = lambda x: x.decode('ascii').split('\n')[:-1]
+   ACCEPTABLE_AVAILABLE_MEMORY = 1024
+   COMMAND = &quot;nvidia-smi -l 1 --query-gpu=memory.used --format=csv&quot;
+   memory_use_info = output_to_list(sp.check_output(COMMAND.split()))[1:]
+   memory_use_values = [int(x.split()[0]) for i, x in enumerate(memory_use_info)]
+   return memory_use_values
+
+def run():
+   pass
+
+t1 = MyThread(run, args=())
+t2 = MyThread(get_gpu_memory, args=())
+
+t1.start()
+t2.start()
+t1.join()
+t2.join()
+res1 = t2.get_result()
+</code></pre>
+<p>However, this does not return every second's usage as well. Is there a good solution?</p>","<p>In the command <code>nvidia-smi -l 1 --query-gpu=memory.used --format=csv</code></p>
+<p>the -l stands for:</p>
+<p><strong>-l,   --loop=               Probe until Ctrl+C at specified second interval.</strong></p>
+<p>So the command:</p>
+<pre><code>COMMAND = 'nvidia-smi -l 1 --query-gpu=memory.used --format=csv'
+sp.check_output(COMMAND.split())
+</code></pre>
+<p>will never terminate and return.</p>
+<p>It works if you remove the event loop from the command(nvidia-smi) to python.</p>
+<p>Here is the code:</p>
+<pre><code>import subprocess as sp
+import os
+from threading import Thread , Timer
+import sched, time
+
+def get_gpu_memory():
+    output_to_list = lambda x: x.decode('ascii').split('\n')[:-1]
+    ACCEPTABLE_AVAILABLE_MEMORY = 1024
+    COMMAND = &quot;nvidia-smi --query-gpu=memory.used --format=csv&quot;
+    try:
+        memory_use_info = output_to_list(sp.check_output(COMMAND.split(),stderr=sp.STDOUT))[1:]
+    except sp.CalledProcessError as e:
+        raise RuntimeError(&quot;command '{}' return with error (code {}): {}&quot;.format(e.cmd, e.returncode, e.output))
+    memory_use_values = [int(x.split()[0]) for i, x in enumerate(memory_use_info)]
+    # print(memory_use_values)
+    return memory_use_values
+
+
+def print_gpu_memory_every_5secs():
+    &quot;&quot;&quot;
+        This function calls itself every 5 secs and print the gpu_memory.
+    &quot;&quot;&quot;
+    Timer(5.0, print_gpu_memory_every_5secs).start()
+    print(get_gpu_memory())
+
+print_gpu_memory_every_5secs()
+
+&quot;&quot;&quot;
+Do stuff.
+&quot;&quot;&quot;
+</code></pre>",https://stackoverflow.com/questions/67707828,python|nvidia
+55788093,How to free gpu memory by deleting tensors?,"How to free gpu memory by deleting tensors?
+
+<p>Suppose I create a tensor and put it on the GPU and don't need it later and want to free the GPU memory allocated to it; How do I do it?</p>
+
+<pre class=""lang-py prettyprint-override""><code>import torch
+a=torch.randn(3,4).cuda() # nvidia-smi shows that some mem has been allocated.
+# do something
+# a does not exist and nvidia-smi shows that mem has been freed.
+</code></pre>
+
+<p>I have tried:</p>
+
+<ol>
+<li><code>del a</code> </li>
+<li><code>del a; torch.cuda.empty_cache()</code></li>
+</ol>
+
+<p>But none of them work.</p>","<p>Running <code>del tensor</code> frees the memory from the GPU but does not return it to the device which is why the memory still being shown as used on <code>nvidia-smi</code>. You can create a new tensor and that would reuse that memory.</p>
+<h3>Sources</h3>
+<p><a href=""https://discuss.pytorch.org/t/how-to-delete-pytorch-objects-correctly-from-memory/947"" rel=""nofollow noreferrer"">https://discuss.pytorch.org/t/how-to-delete-pytorch-objects-correctly-from-memory/947</a>
+<a href=""https://discuss.pytorch.org/t/about-torch-cuda-empty-cache/34232"" rel=""nofollow noreferrer"">https://discuss.pytorch.org/t/about-torch-cuda-empty-cache/34232</a></p>",https://stackoverflow.com/questions/55788093,python|pytorch

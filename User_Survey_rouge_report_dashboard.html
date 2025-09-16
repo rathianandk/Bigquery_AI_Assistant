@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROUGE Evaluation Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .metrics-overview {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            padding: 40px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        .metric-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .metric-title {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .metric-value {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .rouge-1 { color: #e74c3c; }
+        .rouge-2 { color: #f39c12; }
+        .rouge-l { color: #27ae60; }
+
+        .metric-description {
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        .questions-section {
+            padding: 40px;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 30px;
+            text-align: center;
+            color: #2c3e50;
+        }
+
+        .question-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+        }
+
+        .question-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .question-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .question-header {
+            background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+            color: white;
+            padding: 20px;
+        }
+
+        .question-number {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 8px;
+        }
+
+        .question-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            line-height: 1.4;
+        }
+
+        .question-body {
+            padding: 20px;
+        }
+
+        .scores-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .score-item {
+            text-align: center;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .score-rouge-1 {
+            background: rgba(231, 76, 60, 0.1);
+            color: #c0392b;
+        }
+
+        .score-rouge-2 {
+            background: rgba(243, 156, 18, 0.1);
+            color: #d35400;
+        }
+
+        .score-rouge-l {
+            background: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+        }
+
+        .performance-indicator {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .high-performance { background: #2ecc71; color: white; }
+        .medium-performance { background: #f39c12; color: white; }
+        .low-performance { background: #e74c3c; color: white; }
+
+        .question-preview {
+            font-style: italic;
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-top: 15px;
+            padding-left: 15px;
+            border-left: 3px solid #ecf0f1;
+        }
+
+        .insights-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 40px;
+        }
+
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .insight-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .insight-icon {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .insight-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .insight-text {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .stats-bar {
+            height: 8px;
+            background: #ecf0f1;
+            border-radius: 4px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .stats-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .metrics-overview {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
+            
+            .question-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>ROUGE Evaluation Report</h1>
+            <p>Comprehensive Analysis of Generated vs Ground Truth Answers</p>
+        </div>
+
+        <div class="metrics-overview">
+            <div class="metric-card">
+                <div class="metric-title">ROUGE-1</div>
+                <div class="metric-value rouge-1">46.57%</div>
+                <div class="stats-bar">
+                    <div class="stats-fill rouge-1" style="width: 46.57%; background-color: #e74c3c;"></div>
+                </div>
+                <div class="metric-description">Unigram overlap measuring word-level similarity</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-title">ROUGE-2</div>
+                <div class="metric-value rouge-2">25.64%</div>
+                <div class="stats-bar">
+                    <div class="stats-fill rouge-2" style="width: 25.64%; background-color: #f39c12;"></div>
+                </div>
+                <div class="metric-description">Bigram overlap measuring phrase-level coherence</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-title">ROUGE-L</div>
+                <div class="metric-value rouge-l">30.05%</div>
+                <div class="stats-bar">
+                    <div class="stats-fill rouge-l" style="width: 30.05%; background-color: #27ae60;"></div>
+                </div>
+                <div class="metric-description">Longest common subsequence measuring structural similarity</div>
+            </div>
+        </div>
+
+        <div class="questions-section">
+            <h2 class="section-title">Question Performance Analysis</h2>
+            <div class="question-grid">
+                <!-- Question 1 -->
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">Question 1</div>
+                        <div class="question-title">Neural Network on Android GPU</div>
+                    </div>
+                    <div class="question-body">
+                        <div class="scores-grid">
+                            <div class="score-item score-rouge-1">26.75%<br><small>ROUGE-1</small></div>
+                            <div class="score-item score-rouge-2">6.45%<br><small>ROUGE-2</small></div>
+                            <div class="score-item score-rouge-l">17.83%<br><small>ROUGE-L</small></div>
+                        </div>
+                        <span class="performance-indicator low-performance">Low Performance</span>
+                        <div class="question-preview">
+                            "How to run Neural Network model on Android taking advantage of GPU? Anyone tried to run object detection or crnn model on Android?"
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">Question 2</div>
+                        <div class="question-title">NVIDIA OpenCL Project Setup</div>
+                    </div>
+                    <div class="question-body">
+                        <div class="scores-grid">
+                            <div class="score-item score-rouge-1">61.64%<br><small>ROUGE-1</small></div>
+                            <div class="score-item score-rouge-2">37.04%<br><small>ROUGE-2</small></div>
+                            <div class="score-item score-rouge-l">43.34%<br><small>ROUGE-L</small></div>
+                        </div>
+                        <span class="performance-indicator high-performance">High Performance</span>
+                        <div class="question-preview">
+                            "I want to write application in NVIDIA OpenCL in Visual Studio 2017 but don't know how to create project for this purpose."
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question 3 -->
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">Question 3</div>
+                        <div class="question-title">CMake NVCC Compiler Flags</div>
+                    </div>
+                    <div class="question-body">
+                        <div class="scores-grid">
+                            <div class="score-item score-rouge-1">36.10%<br><small>ROUGE-1</small></div>
+                            <div class="score-item score-rouge-2">18.91%<br><small>ROUGE-2</small></div>
+                            <div class="score-item score-rouge-l">25.27%<br><small>ROUGE-L</small></div>
+                        </div>
+                        <span class="performance-indicator medium-performance">Medium Performance</span>
+                        <div class="question-preview">
+                            "How to pass flag to nvcc compiler in CMAKE? I want to pass --ptxas-options=-v only to nvcc..."
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question 4 -->
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">Question 4</div>
+                        <div class="question-title">CMake CUDA Enable for YOLO</div>
+                    </div>
+                    <div class="question-body">
+                        <div class="scores-grid">
+                            <div class="score-item score-rouge-1">33.13%<br><small>ROUGE-1</small></div>
+                            <div class="score-item score-rouge-2">8.46%<br><small>ROUGE-2</small></div>
+                            <div class="score-item score-rouge-l">13.75%<br><small>ROUGE-L</small></div>
+                        </div>
+                        <span class="performance-indicator low-performance">Low Performance</span>
+                        <div class="question-preview">
+                            "How to get cmake to enable cuda when compiling yolo (darknet)? CMAKE_CUDA_COMPILER is NOTFOUND..."
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question 5 -->
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">Question 5</div>
+                        <div class="question-title">MIO Throttle Stall Analysis</div>
+                    </div>
+                    <div class="question-body">
+                        <div class="scores-grid">
+                            <div class="score-item score-rouge-1">41.42%<br><small>ROUGE-1</small></div>
+                            <div class="score-item score-rouge-2">18.52%<br><small>ROUGE-2</small></div>
+                            <div class="score-item score-rouge-l">26.12%<br><small>ROUGE-L</small></div>
+                        </div>
+                        <span class="performance-indicator medium-performance">Medium Performance</span>
+                        <div class="question-preview">
+                            "When does MIO Throttle stall happen? According to NVIDIA documentation..."
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question 6 -->
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">Question 6</div>
+                        <div class="question-title">nvidia-docker without GPU</div>
+                    </div>
+                    <div class="question-body">
+                        <div class="scores-grid">
+                            <div class="score-item score-rouge-1">64.69%<br><small>ROUGE-1</small></div>
+                            <div class="score-item score-rouge-2">35.70%<br><small>ROUGE-2</small></div>
+                            <div class="score-item score-rouge-l">33.26%<br><small>ROUGE-L</small></div>
+                        </div>
+                        <span class="performance-indicator high-performance">High Performance</span>
+                        <div class="question-preview">
+                            "Can nvidia-docker be run without a GPU? Is it possible to run nvidia-docker itself on an x86 CPU?"
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question 7 -->
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">Question 7</div>
+                        <div class="question-title">16-bit Floats in Vulkan GLSL</div>
+                    </div>
+                    <div class="question-body">
+                        <div class="scores-grid">
+                            <div class="score-item score-rouge-1">51.09%<br><small>ROUGE-1</small></div>
+                            <div class="score-item score-rouge-2">29.47%<br><small>ROUGE-2</small></div>
+                            <div class="score-item score-rouge-l">29.91%<br><small>ROUGE-L</small></div>
+                        </div>
+                        <span class="performance-indicator medium-performance">Medium Performance</span>
+                        <div class="question-preview">
+                            "How to get 16bit floats in modern GLSL with Vulkan? It appears at one point in time Nvidia had an extension..."
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question 8 -->
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">Question 8</div>
+                        <div class="question-title">Half-Precision Complex Float</div>
+                    </div>
+                    <div class="question-body">
+                        <div class="scores-grid">
+                            <div class="score-item score-rouge-1">40.83%<br><small>ROUGE-1</small></div>
+                            <div class="score-item score-rouge-2">11.98%<br><small>ROUGE-2</small></div>
+                            <div class="score-item score-rouge-l">20.18%<br><small>ROUGE-L</small></div>
+                        </div>
+                        <span class="performance-indicator medium-performance">Medium Performance</span>
+                        <div class="question-preview">
+                            "Why is half-precision complex float arithmetic not supported in Python and CUDA? NumPy has complex64..."
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question 9 -->
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">Question 9</div>
+                        <div class="question-title">NVIDIA Tensor Cores via Vulkan</div>
+                    </div>
+                    <div class="question-body">
+                        <div class="scores-grid">
+                            <div class="score-item score-rouge-1">68.11%<br><small>ROUGE-1</small></div>
+                            <div class="score-item score-rouge-2">48.62%<br><small>ROUGE-2</small></div>
+                            <div class="score-item score-rouge-l">52.76%<br><small>ROUGE-L</small></div>
+                        </div>
+                        <span class="performance-indicator high-performance">High Performance</span>
+                        <div class="question-preview">
+                            "How can one make use of Nvidia's tensor cores in a compute shader using Vulkan?"
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question 10 -->
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">Question 10</div>
+                        <div class="question-title">Kill GPU Processes by Keyword</div>
+                    </div>
+                    <div class="question-body">
+                        <div class="scores-grid">
+                            <div class="score-item score-rouge-1">57.58%<br><small>ROUGE-1</small></div>
+                            <div class="score-item score-rouge-2">43.08%<br><small>ROUGE-2</small></div>
+                            <div class="score-item score-rouge-l">40.91%<br><small>ROUGE-L</small></div>
+                        </div>
+                        <span class="performance-indicator high-performance">High Performance</span>
+                        <div class="question-preview">
+                            "How to kill process on GPUs with PID in nvidia-smi using keyword? How to kill running processes on GPUs for python..."
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question 11 -->
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">Question 11</div>
+                        <div class="question-title">Install NVIDIA Apex on Colab</div>
+                    </div>
+                    <div class="question-body">
+                        <div class="scores-grid">
+                            <div class="score-item score-rouge-1">54.14%<br><small>ROUGE-1</small></div>
+                            <div class="score-item score-rouge-2">37.99%<br><small>ROUGE-2</small></div>
+                            <div class="score-item score-rouge-l">40.88%<br><small>ROUGE-L</small></div>
+                        </div>
+                        <span class="performance-indicator high-performance">High Performance</span>
+                        <div class="question-preview">
+                            "How to install nvidia apex on Google Colab? ERROR: Directory './' is not installable..."
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question 12 -->
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">Question 12</div>
+                        <div class="question-title">AlphaZero GPU Parallelization</div>
+                    </div>
+                    <div class="question-body">
+                        <div class="scores-grid">
+                            <div class="score-item score-rouge-1">28.47%<br><small>ROUGE-1</small></div>
+                            <div class="score-item score-rouge-2">6.59%<br><small>ROUGE-2</small></div>
+                            <div class="score-item score-rouge-l">13.14%<br><small>ROUGE-L</small></div>
+                        </div>
+                        <span class="performance-indicator low-performance">Low Performance</span>
+                        <div class="question-preview">
+                            "How do I effectively parallelize AlphaZero on the GPU? I'm implementing a version of AlphaZero..."
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question 13 -->
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">Question 13</div>
+                        <div class="question-title">PyTorch GPU Usage Check</div>
+                    </div>
+                    <div class="question-body">
+                        <div class="scores-grid">
+                            <div class="score-item score-rouge-1">45.13%<br><small>ROUGE-1</small></div>
+                            <div class="score-item score-rouge-2">25.89%<br><small>ROUGE-2</small></div>
+                            <div class="score-item score-rouge-l">31.86%<br><small>ROUGE-L</small></div>
+                        </div>
+                        <span class="performance-indicator medium-performance">Medium Performance</span>
+                        <div class="question-preview">
+                            "How do I check if PyTorch is using the GPU? I want to check it directly from inside a Python script."
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question 14 -->
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">Question 14</div>
+                        <div class="question-title">Monitor GPU Usage in Python</div>
+                    </div>
+                    <div class="question-body">
+                        <div class="scores-grid">
+                            <div class="score-item score-rouge-1">64.76%<br><small>ROUGE-1</small></div>
+                            <div class="score-item score-rouge-2">49.33%<br><small>ROUGE-2</small></div>
+                            <div class="score-item score-rouge-l">54.10%<br><small>ROUGE-L</small></div>
+                        </div>
+                        <span class="performance-indicator high-performance">High Performance</span>
+                        <div class="question-preview">
+                            "How to get every second's GPU usage in Python? I want to list every second's GPU usage to measure average/max..."
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question 15 -->
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">Question 15</div>
+                        <div class="question-title">Free GPU Memory by Deleting Tensors</div>
+                    </div>
+                    <div class="question-body">
+                        <div class="scores-grid">
+                            <div class="score-item score-rouge-1">22.61%<br><small>ROUGE-1</small></div>
+                            <div class="score-item score-rouge-2">5.56%<br><small>ROUGE-2</small></div>
+                            <div class="score-item score-rouge-l">11.06%<br><small>ROUGE-L</small></div>
+                        </div>
+                        <span class="performance-indicator low-performance">Low Performance</span>
+                        <div class="question-preview">
+                            "How to free gpu memory by deleting tensors? I want to free the GPU memory allocated to it..."
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="insights-section">
+            <h2 class="section-title">Performance Insights</h2>
+            <div class="insights-grid">
+                <div class="insight-card">
+                    <span class="insight-icon">🎯</span>
+                    <div class="insight-title">Best Performers</div>
+                    <div class="insight-text">
+                        Questions 9 (Tensor Cores), 14 (GPU Monitoring), and 6 (nvidia-docker) achieved the highest ROUGE scores, indicating strong alignment with ground truth answers.
+                    </div>
+                </div>
+                
+                <div class="insight-card">
+                    <span class="insight-icon">📊</span>
+                    <div class="insight-title">Performance Distribution</div>
+                    <div class="insight-text">
+                        6 questions achieved high performance (>50% ROUGE-1), 5 medium performance (30-50%), and 4 low performance (<30%), showing varied answer quality.
+                    </div>
+                </div>
+                
+                <div class="insight-card">
+                    <span class="insight-icon">⚡</span>
+                    <div class="insight-title">Technical Complexity Impact</div>
+                    <div class="insight-text">
+                        Questions involving specific tool configurations and step-by-step instructions tend to score higher than those requiring deep architectural explanations.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
