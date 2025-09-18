@@ -1,4 +1,4 @@
-# BigQuery- NVIDIA Expert System
+# InstaKnow: BigQuery- NVIDIA Expert System
 
 This project is a sophisticated, end-to-end AI assistant specialized in NVIDIA technologies, built natively on Google Cloud's BigQuery. It leverages BigQuery's powerful vector search and ML capabilities to provide accurate, context-aware answers to developer questions about CUDA, GPU programming, and more.
 
