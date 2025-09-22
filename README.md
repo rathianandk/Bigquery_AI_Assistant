@@ -14,11 +14,11 @@ The system follows a multi-stage pipeline, all orchestrated within the Google Cl
 4.  **Interactive UI**: The user interacts with the assistant through a Jupyter-like interface powered by `ipywidgets`. They can select predefined questions or ask their own.
 5.  **Vector Search & Context Retrieval**: The user's question is converted into an embedding. A `VECTOR_SEARCH` query is then executed in BigQuery to find the most relevant documents from the knowledge base.
 6.  **Answer Generation & Display**: The retrieved documents are passed as context to a generative model in Vertex AI (`gemini-2.0-flash`). The model generates a comprehensive answer, which is then displayed to the user along with performance metrics, and search results.
-## 核心文件 (Core Files)
+## Core Files
 
 -   `nvidia_AI_assistant.py`: The main application file. It contains the logic for the interactive UI, search, and answer generation. **Run this file in a Jupyter-compatible environment to start the assistant.**
--   `setup_data_pipeline.py`: A utility script to create the necessary BigQuery dataset, tables, and remote models for the project.
 -   `generate_stackoverflow_embeddings.py`: A script to ingest Stack Overflow data and generate embeddings.
+-   `STNSSR_BigQueryAI_Kaggle.ipynb`: Notebook
 
 ## 🚀 Quick Start
 
