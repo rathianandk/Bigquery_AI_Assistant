@@ -44,9 +44,9 @@ Install all the required Python packages.
 pip install -r requirements.txt
 ```
 
-### 3. Run the Assistant
+### 3. Run the Notebbok
 
-Open `nvidia_AI_assistant.py` in a Jupyter-compatible environment (like VS Code with the Jupyter extension or a Jupyter Notebook) and run all cells. The interactive UI will appear, allowing you to ask questions.
+Open `STNSSR_BigQueryAI_kaggle.ipynb` and run all cells. The interactive UI will appear, allowing you to ask questions.
 
 ## 🏆 Key Features
 
